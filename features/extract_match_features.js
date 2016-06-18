@@ -1,9 +1,21 @@
 var mapping = require("./mapping");
 
+function numOrder (a, b) {
+    return a - b;
+}
+
+function listAverage(list) {
+    return list.reduce(function(a, b) { return a + b; }, 0) / list.length;
+}
+
 function getIsPlayerInTeam(team) {
     return function(player) {
         return team.playersSlots.indexOf(player.player_slot) != -1;
     };
+}
+
+function getPlayersOfTeam(match, team) {
+    return match.players.filter(getIsPlayerInTeam(team));
 }
 
 function extractPreGameFeatures(match, team) {
@@ -18,7 +30,7 @@ function extractPreGameFeatures(match, team) {
     teamRoleCount[mapping.roles.PUSHER]    = 0;
     teamRoleCount[mapping.roles.JUNGLER]   = 0;
 
-    match.players.filter(getIsPlayerInTeam(team)).forEach(function(player) {
+    getPlayersOfTeam(match, team).forEach(function(player) {
         var hero = mapping.heroes.find(function(hero) { return player.hero_id == hero.id; });
         hero.roles.forEach(function(heroRole) {
             teamRoleCount[heroRole]++;
@@ -36,11 +48,31 @@ function extractPreGameFeatures(match, team) {
 }
 
 function extractLaneSetupFeatures(match, team) {
+    //missing in this version of dump.
     return [];
 }
 
 function extractFarmingFeatures(match, team) {
-    return [];
+    var xpmValues = [];
+    var gpmValues = [];
+    getPlayersOfTeam(match, team).forEach(function(player) {
+        xpmValues.push(player.xp_per_min);
+        gpmValues.push(player.gold_per_min);
+    });
+
+    xpmValues.sort(numOrder);
+    gpmValues.sort(numOrder);
+
+    return [
+        Math.max(...xpmValues),
+        listAverage(xpmValues),
+        Math.min(...xpmValues),
+        xpmValues[2] - xpmValues[1], //diff between least farmed core and most farmed sup
+        Math.max(...gpmValues),
+        listAverage(gpmValues),
+        Math.min(...gpmValues),
+        gpmValues[2] - gpmValues[1] //diff between least farmed core and most farmed sup
+    ];
 }
 
 function extractCombatFeatures(match, team) {
