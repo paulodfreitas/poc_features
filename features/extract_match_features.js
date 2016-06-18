@@ -1,5 +1,16 @@
 var mapping = require("./mapping");
 
+const TEAM = {
+    RADIANT  : {
+        name : "RADIANT",
+        playersSlots : [0, 1, 2, 3, 4]
+    },
+    DIRE     : {
+        name : "DIRE",
+        playersSlots : [128, 129, 130, 131, 132]
+    }
+};
+
 function numOrder (a, b) {
     return a - b;
 }
@@ -80,6 +91,7 @@ function extractCombatFeatures(match, team) {
 }
 
 function extractObjectFeatures(match, team) {
+
     return [];
 }
 
@@ -95,26 +107,22 @@ function extractClassFeatures(match, team) {
     ];
 }
 
+function extractGlobalFeatures(match, team) {
+    return [
+        match.duration,
+        team.name == TEAM.RADIANT.name ? match.radiant_win : !match.radiant_win
+    ]
+}
+
 function extractMatchFeatures(match, team) {
     return extractClassFeatures(match, team)
+        .concat(extractGlobalFeatures(match, team))
         .concat(extractPreGameFeatures(match, team))
         .concat(extractLaneSetupFeatures(match, team))
         .concat(extractFarmingFeatures(match, team))
         .concat(extractCombatFeatures(match, team))
         .concat(extractObjectFeatures(match, team));
 }
-
-const TEAM = {
-    RADIANT  : {
-        name : "RADIANT",
-        playersSlots : [0, 1, 2, 3, 4]
-    },
-    DIRE     : {
-        name : "DIRE",
-        playersSlots : [128, 129, 130, 131, 132]
-    }
-};
-
 
 
 module.exports  = function(match) {
