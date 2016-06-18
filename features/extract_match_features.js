@@ -67,7 +67,17 @@ function extractLaneSetupFeatures(match, team) {
     return [];
 }
 
-function extractFarmingFeatures(match, team) {
+function extractGoldSourcesFeatures(match, team) {
+    var players = getPlayersOfTeam(match, team);
+    return [
+        listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.CREEP] : 0; })),
+        listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.ROSHAN] : 0; })),
+        listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.HERO] : 0; })),
+        listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.STRUCUTURE] : 0; }))
+    ];
+}
+
+function extractFarmingPriorityFeatures(match, team) {
     var xpmValues = [];
     var gpmValues = [];
     getPlayersOfTeam(match, team).forEach(function(player) {
@@ -216,7 +226,8 @@ function extractMatchFeatures(match, team) {
         .concat(extractGlobalFeatures(match, team))
         .concat(extractPreGameFeatures(match, team))
         .concat(extractLaneSetupFeatures(match, team))
-        .concat(extractFarmingFeatures(match, team))
+        .concat(extractFarmingPriorityFeatures(match, team))
+        .concat(extractGoldSourcesFeatures(match, team))
         .concat(extractItemsFeatures(match, team))
         .concat(extractCombatFeatures(match, team))
         .concat(extractObjectFeatures(match, team));
