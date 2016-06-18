@@ -3722,10 +3722,37 @@ var itemTypeMapping = {
     CONSUMABLE : "consumable",
     SUPPORT    : "rare"
 };
+//
+// var goldReasons =  {
+//     "11": {
+//         "name": "Structure",
+//         "tooltip": "Gold from destroying buildings"
+//     },
+//     "12": {
+//         "name": "Hero",
+//         "tooltip": "Gold from hero kills and assists"
+//     },
+//     "13": {
+//         "name": "Creep",
+//         "tooltip": "Gold from killing creeps"
+//     },
+//     "14": {
+//         "name": "Roshan",
+//         "tooltip": "Gold from killing Roshan"
+//     }
+// };
+
+var goldReasons = {
+    STRUCUTURE : "11",
+    HERO       : "12",
+    CREEP      : "13",
+    ROSHAN     : "14"
+};
 
 module.exports = {
     "heroes"   : heroes,
     "roles"    : ROLES,
     "items"    : items,
-    "itemType" : itemTypeMapping
+    "itemType" : itemTypeMapping,
+    "gold"     : goldReasons
 };
