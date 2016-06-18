@@ -90,6 +90,48 @@ function extractFarmingFeatures(match, team) {
     ];
 }
 
+function purchaseToTuple(o) {
+    var tupleList = [];
+    for(var key in o) {
+        if (o.hasOwnProperty(key)) {
+            tupleList.push({
+                "itemName"  : key,
+                "times" : o[key]
+            });
+        }
+    }
+
+    return tupleList;
+}
+
+function filterByItemType(purchaseEntry, itemType) {
+    return purchaseEntry.itemName in mapping.items ? mapping.items[purchaseEntry.itemName].qual == itemType : false;
+}
+
+function isConsumable(purchaseEntry) {
+    return filterByItemType(purchaseEntry, mapping.itemType.CONSUMABLE);
+}
+
+function isSupportGroup(purchaseEntry) {
+    return filterByItemType(purchaseEntry, mapping.itemType.SUPPORT);
+}
+
+function getItemValue(purchaseEntry) {
+    return mapping.items[purchaseEntry.itemName].cost * purchaseEntry.times;
+}
+
+function extractItemsFeatures(match, team) {
+    var players = getPlayersOfTeam(match, team);
+    return [
+        // total gold spent
+        listSum(players.map(function(p) { return p.gold_spent; })),
+        // total gold spend with consumables
+        listSum(players.map(function(p) { return listSum(purchaseToTuple(p.purchase).filter(isConsumable).map(getItemValue)); })),
+        // total gold spend with support items
+        listSum(players.map(function(p) { return listSum(purchaseToTuple(p.purchase).filter(isSupportGroup).map(getItemValue)); }))
+    ];
+}
+
 function extractCombatFeatures(match, team) {
     return [
         match.teamfights.length,
@@ -175,6 +217,7 @@ function extractMatchFeatures(match, team) {
         .concat(extractPreGameFeatures(match, team))
         .concat(extractLaneSetupFeatures(match, team))
         .concat(extractFarmingFeatures(match, team))
+        .concat(extractItemsFeatures(match, team))
         .concat(extractCombatFeatures(match, team))
         .concat(extractObjectFeatures(match, team));
 }
