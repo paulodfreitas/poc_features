@@ -15,8 +15,12 @@ function numOrder (a, b) {
     return a - b;
 }
 
+function listSum(list) {
+    return list.reduce(function(a, b) { return a + b; }, 0)
+}
+
 function listAverage(list) {
-    return list.reduce(function(a, b) { return a + b; }, 0) / list.length;
+    return listSum(list) / list.length;
 }
 
 function getIsPlayerInTeam(team) {
@@ -87,12 +91,63 @@ function extractFarmingFeatures(match, team) {
 }
 
 function extractCombatFeatures(match, team) {
-    return [];
+    return [
+        match.teamfights.length,
+        listSum(match.teamfights.map(function(fight) { return fight.deaths; })),
+        listAverage(match.teamfights.map(function(fight) { return fight.deaths; })),
+        listAverage(match.teamfights.map(function(fight) { return fight.end - fight.start; })),
+        listAverage(match.teamfights.map(function(fight) {
+            return fight.players.filter(function(player) {
+                return player.deaths > 0 || player.damage > 0 || Object.keys(player.ability_uses).length
+            }).length;
+        }))
+    ];
 }
 
 function extractObjectFeatures(match, team) {
 
-    return [];
+    function getNrTowerDestroyed(towerStatus) {
+        const nrTowers = 11;
+        var nrTowersDestroyed = 0;
+        for(var i = 0; i < nrTowers; i++) {
+            if ((towerStatus & Math.pow(2, i)) == 0) {
+                nrTowersDestroyed++;
+            }
+        }
+
+        return nrTowersDestroyed;
+    }
+
+    var playersOfTeam = getPlayersOfTeam(match, team);
+    return [
+        // nr roshan killed
+        listSum(playersOfTeam.map(function(player) {
+            return 'npc_dota_roshan' in player.killed ? player.killed['npc_dota_roshan'] : 0;
+        })),
+        // nr runes picked
+        listSum(playersOfTeam.map(function(player) {
+            var nrRunesPickedByPlayer = 0;
+            for(var runeId in player.runes) {
+                if (player.runes.hasOwnProperty(runeId)) {
+                    nrRunesPickedByPlayer += player.runes[runeId];
+                }
+            }
+
+            return nrRunesPickedByPlayer;
+        })),
+        // nr enemy's tower destroyed
+        getNrTowerDestroyed(
+            team.name == TEAM.RADIANT.name ? match.tower_status_dire : match.tower_status_radiant
+        ),
+        // nr team's tower destroyed
+        getNrTowerDestroyed(
+            team.name == TEAM.RADIANT.name ? match.tower_status_radiant : match.tower_status_dire
+        ),
+        // time of first tower
+        match.objectives.find(function(objective) {
+            return objective.subtype === 'CHAT_MESSAGE_TOWER_KILL';
+        }).time
+    ];
 }
 
 function extractClassFeatures(match, team) {
@@ -111,7 +166,7 @@ function extractGlobalFeatures(match, team) {
     return [
         match.duration,
         team.name == TEAM.RADIANT.name ? match.radiant_win : !match.radiant_win
-    ]
+    ];
 }
 
 function extractMatchFeatures(match, team) {
