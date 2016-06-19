@@ -1,4 +1,5 @@
 var mapping = require("./mapping");
+const InvalidMatch = require("./invalidMatch");
 
 const TEAM = {
     RADIANT  : {
@@ -197,7 +198,9 @@ function extractObjectFeatures(match, team) {
         ),
         // time of first tower
         match.objectives.find(function(objective) {
-            return objective.subtype === 'CHAT_MESSAGE_TOWER_KILL';
+            return objective.subtype === 'CHAT_MESSAGE_TOWER_KILL'
+                || objective.type === 'CHAT_MESSAGE_TOWER_KILL';
+
         }).time
     ];
 }
@@ -221,7 +224,25 @@ function extractGlobalFeatures(match, team) {
     ];
 }
 
+function validateAbandonedPlayers(match) {
+    if (match.players.find(function(p) {
+        return p.leaver_status != 0;
+    })) {
+        throw new InvalidMatch("Match not fully played.", InvalidMatch.CODE_NOT_FULLY_PLAYED);
+    }
+}
+
+function validateHeroPicks(match) {
+    if (match.players.find(function(p) {
+        return p.hero_id == 0;
+    })) {
+        throw new InvalidMatch("Not all players played!.", InvalidMatch.CODE_PLAYER_DONT_PLAYED);
+    }
+}
+
 function extractMatchFeatures(match, team) {
+    validateAbandonedPlayers(match);
+    validateHeroPicks(match);
     return extractClassFeatures(match, team)
         .concat(extractGlobalFeatures(match, team))
         .concat(extractPreGameFeatures(match, team))
