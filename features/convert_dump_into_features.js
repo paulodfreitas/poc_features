@@ -3,7 +3,7 @@ const fs = require("fs");
 const zlib = require("zlib");
 const JSONStream = require("JSONStream");
 
-const outputFileName = "matches.csv";
+const outputFileName = "../matches.csv";
 
 var JSONParser =  JSONStream.parse("*");
 
