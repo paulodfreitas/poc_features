@@ -1,4 +1,4 @@
 .idea
 node_modules
-matches.csv
+*.csv
 sample_match.yasp
