@@ -8,7 +8,7 @@ function InvalidMatch(message, code) {
 
 InvalidMatch.CODE_NOT_FULLY_PLAYED = 1;
 InvalidMatch.CODE_PLAYER_DONT_PLAYED = 2;
-InvalidMatch.CODE_TRES = 3;
+InvalidMatch.CODE_WEIRD_MATCH = 3;
 InvalidMatch.CODE_QUATRO = 4;
 InvalidMatch.CODE_CINCO = 5;
 InvalidMatch.prototype = Object.create(Error.prototype);
