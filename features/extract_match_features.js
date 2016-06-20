@@ -172,6 +172,7 @@ function extractObjectFeatures(match, team) {
     }
 
     var playersOfTeam = getPlayersOfTeam(match, team);
+    var firstTowerKill = null;
     return [
         // nr roshan killed
         listSum(playersOfTeam.map(function(player) {
@@ -197,11 +198,11 @@ function extractObjectFeatures(match, team) {
             team.name == TEAM.RADIANT.name ? match.tower_status_radiant : match.tower_status_dire
         ),
         // time of first tower
-        match.objectives.find(function(objective) {
+        (firstTowerKill = match.objectives.find(function(objective) {
             return objective.subtype === 'CHAT_MESSAGE_TOWER_KILL'
                 || objective.type === 'CHAT_MESSAGE_TOWER_KILL';
 
-        }).time
+        })) ? firstTowerKill.time : NaN
     ];
 }
 
@@ -240,9 +241,17 @@ function validateHeroPicks(match) {
     }
 }
 
+function validateWeirdMatches(match) {
+    var weirdMatchIds = [1997183014, 1964166550];
+    if (weirdMatchIds.indexOf(match.match_id) != -1) {
+        throw new InvalidMatch("Weird match", InvalidMatch.CODE_WEIRD_MATCH)
+    }
+}
+
 function extractMatchFeatures(match, team) {
     validateAbandonedPlayers(match);
     validateHeroPicks(match);
+    validateWeirdMatches(match);
     return extractClassFeatures(match, team)
         .concat(extractGlobalFeatures(match, team))
         .concat(extractPreGameFeatures(match, team))
