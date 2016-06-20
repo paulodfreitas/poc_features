@@ -248,9 +248,19 @@ function validateWeirdMatches(match) {
     }
 }
 
+function validateMissingDataMatch(match) {
+    if (match.players.find(function(p) {
+            return p.gold_reasons == null;
+        })) {
+        throw new InvalidMatch("Missing data.", InvalidMatch.CODE_MISSING_DATA);
+    }
+
+}
+
 function extractMatchFeatures(match, team) {
     validateAbandonedPlayers(match);
     validateHeroPicks(match);
+    validateMissingDataMatch(match);
     validateWeirdMatches(match);
     return extractClassFeatures(match, team)
         .concat(extractGlobalFeatures(match, team))
