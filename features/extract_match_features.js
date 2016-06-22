@@ -202,7 +202,7 @@ function extractObjectFeatures(match, team) {
             return objective.subtype === 'CHAT_MESSAGE_TOWER_KILL'
                 || objective.type === 'CHAT_MESSAGE_TOWER_KILL';
 
-        })) ? firstTowerKill.time : NaN
+        })) ? firstTowerKill.time : match.duration
     ];
 }
 
