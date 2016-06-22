@@ -21,7 +21,7 @@ function listSum(list) {
 }
 
 function listAverage(list) {
-    return listSum(list) / list.length;
+    return list.length ? listSum(list) / list.length : 0;
 }
 
 function getIsPlayerInTeam(team) {
