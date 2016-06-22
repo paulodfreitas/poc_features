@@ -72,9 +72,9 @@ function extractGoldSourcesFeatures(match, team) {
     var players = getPlayersOfTeam(match, team);
     return [
         listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.CREEP] : 0; })),
-        listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.ROSHAN] : 0; })),
-        listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.HERO] : 0; })),
-        listSum(players.map(function (p) { return mapping.gold.CREEP in p.gold_reasons ? p.gold_reasons[mapping.gold.STRUCUTURE] : 0; }))
+        listSum(players.map(function (p) { return mapping.gold.ROSHAN in p.gold_reasons ? p.gold_reasons[mapping.gold.ROSHAN] : 0; })),
+        listSum(players.map(function (p) { return mapping.gold.HERO in p.gold_reasons ? p.gold_reasons[mapping.gold.HERO] : 0; })),
+        listSum(players.map(function (p) { return mapping.gold.STRUCUTURE in p.gold_reasons ? p.gold_reasons[mapping.gold.STRUCUTURE] : 0; }))
     ];
 }
 
