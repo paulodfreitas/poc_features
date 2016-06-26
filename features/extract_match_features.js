@@ -219,9 +219,10 @@ function extractClassFeatures(match, team) {
 }
 
 function extractGlobalFeatures(match, team) {
+    var win = team.name == TEAM.RADIANT.name ? match.radiant_win : !match.radiant_win
     return [
         match.duration,
-        team.name == TEAM.RADIANT.name ? match.radiant_win : !match.radiant_win
+        win ? 1 : 0
     ];
 }
 
