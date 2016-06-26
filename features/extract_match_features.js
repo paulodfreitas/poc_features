@@ -206,13 +206,68 @@ function extractObjectFeatures(match, team) {
     ];
 }
 
+function regionByClusterId(clusteId) {
+    var clusterMapToRegion = {
+        // north america
+        111 : "America",
+        112 : "America",
+        121 : "America",
+        122 : "America",
+        123 : "America",
+        // south america
+        204 : "America",
+        242 : "America",
+        251 : "America",
+
+        132 : "Europe",
+        133 : "Europe",
+        138 : "Europe",
+        181 : "Europe",
+        182 : "Europe",
+        184 : "Europe",
+        185 : "Europe",
+        187 : "Europe",
+        188 : "Europe",
+        191 : "Europe",
+        192 : "Europe",
+
+        223 : "CHINA",
+        224 : "CHINA",
+        225 : "CHINA",
+        231 : "CHINA",
+
+        142 : "Asia",
+        143 : "Asia",
+        144 : "Asia",
+        145 : "Asia",
+        151 : "Asia",
+        152 : "Asia",
+        153 : "Asia",
+        154 : "Asia",
+        155 : "Asia",
+        156 : "Asia",
+
+        161 : "Others", //dubai
+        171 : "Others", //australia
+        211 : "Others", //south africa
+        212 : "Others", //south africa
+        213 : "Others" //south africa
+    };
+
+    return clusterMapToRegion[clusteId];
+}
+
+function isLeagueMatch(leagueId) {
+    return leagueid == 0 ? 0 : 1;
+}
+
 function extractClassFeatures(match, team) {
     return [
         match.match_id,
         match.lobby_type,   //lobby vs public match making
         match.game_mode,    //ranked x casual | ap x cm x others
-        match.cluster,      //region
-        match.leagueid,     //champ or not
+        regionByClusterId(match.cluster),      //region
+        isLeagueMatch(match.leagueid),     //champ or not
         match.skill,        //normal, high, very high
         team.name
     ];
