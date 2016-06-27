@@ -258,17 +258,29 @@ function regionByClusterId(clusteId) {
 }
 
 function isLeagueMatch(leagueId) {
-    return leagueid == 0 ? 0 : 1;
+    return leagueId == 0 ? 0 : 1;
 }
 
-function extractClassFeatures(match, team) {
+function getMatchSkill(match, mmrMap) {
+    var match_mrr = listAverage(match.players.filter(function(p) {
+        return p.account_id.toString() in mmrMap;
+    }).map(function(p) {
+        return mmrMap[p.account_id.toString()];
+    }));
+
+    if (match_mrr < 3100) return 1; //normal
+    if (match_mrr < 3700) return 2; //high
+    return 3; //very-high
+}
+
+function extractClassFeatures(match, team, mmrMap) {
     return [
         match.match_id,
         match.lobby_type,   //lobby vs public match making
         match.game_mode,    //ranked x casual | ap x cm x others
         regionByClusterId(match.cluster),      //region
         isLeagueMatch(match.leagueid),     //champ or not
-        match.skill,        //normal, high, very high
+        getMatchSkill(match, mmrMap),        //normal, high, very high
         team.name
     ];
 }
@@ -313,12 +325,12 @@ function validateMissingDataMatch(match) {
 
 }
 
-function extractMatchFeatures(match, team) {
+function extractMatchFeatures(match, team, mmrMap) {
     validateAbandonedPlayers(match);
     validateHeroPicks(match);
     validateMissingDataMatch(match);
     validateWeirdMatches(match);
-    return extractClassFeatures(match, team)
+    return extractClassFeatures(match, team, mmrMap)
         .concat(extractGlobalFeatures(match, team))
         .concat(extractPreGameFeatures(match, team))
         .concat(extractLaneSetupFeatures(match, team))
@@ -330,9 +342,9 @@ function extractMatchFeatures(match, team) {
 }
 
 
-module.exports  = function(match) {
+module.exports  = function(match, mmrMap) {
     return {
-        "RADIANT" : extractMatchFeatures(match, TEAM.RADIANT),
-        "DIRE" : extractMatchFeatures(match, TEAM.DIRE)
+        "RADIANT" : extractMatchFeatures(match, TEAM.RADIANT, mmrMap),
+        "DIRE" : extractMatchFeatures(match, TEAM.DIRE, mmrMap)
     };
 };

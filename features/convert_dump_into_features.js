@@ -6,6 +6,7 @@ const InvalidMatch = require("./invalidMatch");
 
 const outputFileName = "../matches.csv";
 
+var mmrMap = JSON.parse(fs.readFileSync("../mmr.json"));
 var JSONParser =  JSONStream.parse("*");
 
 function listToString(list) {
@@ -24,7 +25,7 @@ invalidMatchesReasons[7] = 0;
 
 JSONParser.on("data", function(match) {
     try {
-        var teams = extractMatchFeatures(match);
+        var teams = extractMatchFeatures(match, mmrMap);
         fs.appendFileSync(outputFileName, listToString(teams.RADIANT));
         fs.appendFileSync(outputFileName, listToString(teams.DIRE));
         nrParsedMatches++;
